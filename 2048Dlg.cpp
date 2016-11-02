@@ -63,6 +63,10 @@ BEGIN_MESSAGE_MAP(CMy2048Dlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
+	ON_BN_CLICKED(IDC_BUTTON1, &CMy2048Dlg::OnRetry)
+	ON_BN_CLICKED(IDC_BUTTON2, &CMy2048Dlg::OnRedo)
+	ON_WM_TIMER()
+	ON_WM_ERASEBKGND()
 END_MESSAGE_MAP()
 
 
@@ -151,3 +155,31 @@ HCURSOR CMy2048Dlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
+
+
+void CMy2048Dlg::OnRetry()
+{
+	// TODO: 在此添加控件通知处理程序代码
+}
+
+
+void CMy2048Dlg::OnRedo()
+{
+	// TODO: 在此添加控件通知处理程序代码
+}
+
+
+void CMy2048Dlg::OnTimer(UINT_PTR nIDEvent)
+{
+	// TODO: 在此添加消息处理程序代码和/或调用默认值
+
+	CDialogEx::OnTimer(nIDEvent);
+}
+
+
+BOOL CMy2048Dlg::OnEraseBkgnd(CDC* pDC)
+{
+	// TODO: 在此添加消息处理程序代码和/或调用默认值
+
+	return 1;
+}
