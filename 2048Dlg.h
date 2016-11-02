@@ -4,7 +4,9 @@
 
 #pragma once
 
-
+#include <list>
+#include <math.h>
+using namespace std;
 // CMy2048Dlg ¶Ô»°¿ò
 class CMy2048Dlg : public CDialogEx
 {
@@ -30,7 +32,7 @@ protected:
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
 public:
-	afx_msg void OnRetry();
+	afx_msg void OnRebegin();
 	afx_msg void OnRedo();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
@@ -58,4 +60,8 @@ private:
 	int score;
 	bool over;
 	int rem[4][4];
+
+	
+public:
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
 };
