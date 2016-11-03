@@ -37,7 +37,7 @@ public:
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 
 private:
-	void auto_run();
+
 	int getN(int m);
 	bool randM();
 	void show();
@@ -46,7 +46,7 @@ private:
 	bool move_right(int n[4][4],int &n_score);
 	bool move_up(int n[4][4],int &n_score);
 	bool move_down(int n[4][4],int &n_score);
-	double getCha(int n[4][4]);
+
 
 	CDC mdc;//设备上下文对象的类
 	CBitmap bmp;

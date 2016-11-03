@@ -277,11 +277,7 @@ void CMy2048Dlg::OnTimer(UINT_PTR nIDEvent)
 {
 	if(1==nIDEvent)
 		show();
-	else if(5==nIDEvent)
-	{
-		for(int i=0;i<5;i++)
-			auto_run();
-	}
+	
 
 	CDialogEx::OnTimer(nIDEvent);
 }
@@ -321,12 +317,6 @@ BOOL CMy2048Dlg::PreTranslateMessage(MSG* pMsg)
 		{
 		case VK_RETURN:
 			return 1;
-		case VK_SPACE:
-			auto_run();
-			return 1;
-		case 'G':
-			SetTimer(5,10,NULL);
-			return 1;
 		case VK_LEFT:
 		case VK_RIGHT:
 		case VK_UP:
@@ -340,9 +330,6 @@ BOOL CMy2048Dlg::PreTranslateMessage(MSG* pMsg)
 			return 1;
 		}
 	}
-	else if(pMsg->message == WM_KEYUP)
-		if(pMsg->wParam == 'G')
-			KillTimer(5);
 
 	return CDialog::PreTranslateMessage(pMsg);
 }
@@ -823,92 +810,3 @@ bool CMy2048Dlg::move_right(int n[4][4],int &n_score)
 	return r;
 }
 
-//得到最适合的自动步骤
-double CMy2048Dlg::getCha(int n[4][4])
-{
-	double c=0;
-	int i,k,u;
-
-	for(i=0;i<4;i++)
-		for(k=0;k<3;k++)
-		{
-			u=abs(n[i][k]-n[i][k+1]);
-			if(u==0)
-				c -= 3*n[i][k];
-			else c += u*1.5;
-		}
-		for(k=0;k<4;k++)
-			for(i=0;i<3;i++)
-			{
-				u=abs(n[i][k]-n[i+1][k]);
-				if(u==0)
-					c -= 3*n[i][k];
-				else c += u*1.5;
-			}
-	for(i=0;i<4;i++)
-		for(k=0;k<4;k++)
-		{
-			int u=n[i][k];
-			c =c- u*(getN(u)-1)*4;
-	}
-	return c;
-}
-
-void CMy2048Dlg::auto_run()
-{
-	int new_M[4][4];
-	int n_score;
-	DWORD VK=0;
-	double mincha=1.0e+20;
-	int i,k;
-	for(i=0;i<4;i++)
-		for(k=0;k<4;k++)
-			new_M[i][k]=m[i][k];
-	if(move_down(new_M,n_score))
-	{
-		int c=getCha(new_M);
-		if(c<mincha)
-		{
-			mincha=c;
-			VK=VK_DOWN;
-		}
-	}
-	for(i=0;i<4;i++)
-		for(k=0;k<4;k++)
-			new_M[i][k]=m[i][k];
-	if(move_right(new_M,n_score))
-	{
-		int c=getCha(new_M);
-		if(c<mincha)
-		{
-			mincha=c;
-			VK=VK_RIGHT;
-		}
-	}
-	for(i=0;i<4;i++)
-		for(k=0;k<4;k++)
-			new_M[i][k]=m[i][k];
-	if(move_left(new_M,n_score))
-	{
-		int c=getCha(new_M);
-		if(c<mincha)
-		{
-			mincha=c;
-			VK=VK_LEFT;
-		}
-	}
-	
-	for(i=0;i<4;i++)
-		for(k=0;k<4;k++)
-			new_M[i][k]=m[i][k];
-	if(move_up(new_M,n_score))
-	{
-		int c=getCha(new_M);
-		if(c<mincha)
-		{
-			mincha=c;
-			VK=VK_UP;
-		}
-	}
-	moveK(VK);
-}
