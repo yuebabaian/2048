@@ -9,41 +9,10 @@
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
 #endif
 
-
-// 用于应用程序“关于”菜单项的 CAboutDlg 对话框
-
-class CAboutDlg : public CDialogEx
-{
-public:
-	CAboutDlg();
-
-// 对话框数据
-	enum { IDD = IDD_ABOUTBOX };
-
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
-
-// 实现
-protected:
-	DECLARE_MESSAGE_MAP()
-};
-
-CAboutDlg::CAboutDlg() : CDialogEx(CAboutDlg::IDD)
-{
-}
-
-void CAboutDlg::DoDataExchange(CDataExchange* pDX)
-{
-	CDialogEx::DoDataExchange(pDX);
-}
-
-BEGIN_MESSAGE_MAP(CAboutDlg, CDialogEx)
-END_MESSAGE_MAP()
-
-
-// CMy2048Dlg 对话框
 
 
 
@@ -60,7 +29,7 @@ void CMy2048Dlg::DoDataExchange(CDataExchange* pDX)
 }
 
 BEGIN_MESSAGE_MAP(CMy2048Dlg, CDialogEx)
-	ON_WM_SYSCOMMAND()
+
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
 	ON_BN_CLICKED(IDC_BUTTON2, &CMy2048Dlg::OnRedo)
@@ -132,7 +101,7 @@ void CMy2048Dlg::show()
 			rt.right=rt.left+kw;
 			rt.bottom=rt.top+kw;
 
-			//？？？？
+			
 			if(i*4+k == new_pos)
 			{
 				const static int b[]={
@@ -167,7 +136,7 @@ void CMy2048Dlg::show()
 	mdc.SelectObject(&brush);
 	mdc.SetTextColor(RGB(238,235,232));
 	RECT rt={580,170,760,300};
-	mdc.RoundRect(rt.left,rt.top,rt.right,rt.bottom,800,800);
+	mdc.RoundRect(rt.left,rt.top,rt.right,rt.bottom,8,8);
 	CString str;
 	str="score";
 	rt.bottom = (rt.bottom - rt.top)/2 + rt.top;
@@ -251,18 +220,7 @@ BOOL CMy2048Dlg::OnInitDialog()
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 
-void CMy2048Dlg::OnSysCommand(UINT nID, LPARAM lParam)
-{
-	if ((nID & 0xFFF0) == IDM_ABOUTBOX)
-	{
-		CAboutDlg dlgAbout;
-		dlgAbout.DoModal();
-	}
-	else
-	{
-		CDialogEx::OnSysCommand(nID, lParam);
-	}
-}
+
 
 // 如果向对话框添加最小化按钮，则需要下面的代码
 //  来绘制该图标。对于使用文档/视图模型的 MFC 应用程序，
@@ -347,7 +305,7 @@ void CMy2048Dlg::OnRebegin()
 	over=0;
 	randM();
 	randM();
-	GetDlgItem(IDC_BUTTON1)->EnableWindow(true);//接受外界输入
+	GetDlgItem(IDC_BUTTON2)->EnableWindow(true);//接受外界输入
 
 	for(i=0;i<4;i++)
 		for(k=0;k<4;k++)
@@ -363,8 +321,6 @@ BOOL CMy2048Dlg::PreTranslateMessage(MSG* pMsg)
 		{
 		case VK_RETURN:
 			return 1;
-		case VK_ESCAPE:
-			exit(0);
 		case VK_SPACE:
 			auto_run();
 			return 1;
@@ -442,6 +398,7 @@ void CMy2048Dlg::moveK(DWORD VK)
 			new_M[i][k]=m[i][k];
 	int n_score;
 	bool r;
+	GetDlgItem(IDC_BUTTON2)->EnableWindow(true);
 	switch(VK)
 	{
 	case VK_LEFT:
@@ -504,33 +461,88 @@ bool CMy2048Dlg::move_up(int n[4][4],int &n_score)
 	bool r=0;
 	n_score = score;
 
-	for(k=1;k<4;++k)//行数
-	{
-		for(k1=k;k1>=1;--k1)
-		{
-			for(i=0;i<4;++i)//列数
-			{
-				if(n[k1-1][i]==0)
-				{
-					if(n[k1][i]!=0)
-						r=1;
-					n[k1-1][i]=n[k1][i];
-					n[k1][i]=0;
-				}
-				else
-				{
-					if(n[k1][i]==n[k1-1][i])
-					{
-						r=1;
+	//for(k=1;k<4;++k)//行数
+	//{
+	//	for(k1=k;k1>=1;--k1)
+	//	{
+	//		for(i=0;i<4;++i)//列数
+	//		{
+	//			if(n[k1-1][i]==0)
+	//			{
+	//				if(n[k1][i]!=0)
+	//					r=1;
+	//				n[k1-1][i]=n[k1][i];
+	//				n[k1][i]=0;
+	//			}
+	//			else
+	//			{
+	//				if(n[k1][i]==n[k1-1][i])
+	//				{
+	//					r=1;
 
-						n[k1-1][i]*=2;
-						n[k1][i]=0;
-						n_score+=n[k1-1][i];
-					}
+	//					n[k1-1][i]*=2;
+	//					n[k1][i]=0;
+	//					n_score+=n[k1-1][i];
+	//				}
+	//			}
+	//		}
+	//	}
+
+	//}
+
+
+	//更为合理的移动方式
+	for(k=0;k<4;k++)
+	{
+		for(i=0;i<3;i++)
+		{
+			if(n[i][k]==0)
+			{
+				int w;
+				for(w=i;w<3;w++)
+				{
+					n[w][k]=n[w+1][k];
+					if(n[w][k] != 0)
+						r=1;
 				}
+				n[3][k]=0;
+
+				for(w=i;w<4;w++)
+					if(n[w][k] != 0)
+						break;
+				if(w!=4)
+					i--;
+			}
+			else if(n[i+1][k] == 0)
+			{
+				int w;
+				for(w=i+1;w<3;w++)
+				{
+					n[w][k]=n[w+1][k];
+					if(n[w][k] != 0)
+						r=1;
+				}
+				n[3][k]=0;
+
+				for(w=i+1;w<4;w++)
+					if(n[w][k] != 0)
+						break;
+				if(w!=4)
+					i--;
+			}
+			else if(n[i][k]==n[i+1][k])
+			{
+				if(n[i][k] != 0)
+					r=1;
+				n[i][k] *= 2;
+				n_score += n[i][k];
+				for(int w=i+1;w<3;w++)
+				{
+					n[w][k]=n[w+1][k];
+				}
+				n[3][k]=0;
 			}
 		}
-
 	}
 	return r;
 }
@@ -540,7 +552,60 @@ bool CMy2048Dlg::move_down(int n[4][4],int &n_score)
 	bool r=0;
 	n_score = score;
 
-	for(k=2;k>=0;--k)
+	for(k=0;k<4;k++)
+	{
+		for(i=3;i>0;i--)
+		{
+			if(n[i][k]==0)
+			{
+				int w;
+				for(w=i;w>0;w--)
+				{
+					n[w][k]=n[w-1][k];
+					if(n[w][k] != 0)
+						r=1;
+				}
+				n[0][k]=0;
+
+				for(w=i;w>0;w--)
+					if(n[w][k] != 0)
+						break;
+				if(w>0)
+					i++;
+			}
+			else if(n[i-1][k] == 0)
+			{
+				int w;
+				for(w=i-1;w>0;w--)
+				{
+					n[w][k]=n[w-1][k];
+					if(n[w][k] != 0)
+						r=1;
+				}
+				n[0][k]=0;
+
+				for(w=i-1;w>0;w--)
+					if(n[w][k] != 0)
+						break;
+				if(w>0)
+					i++;
+			}
+			else if(n[i][k]==n[i-1][k])
+			{
+				if(n[i][k] != 0)
+					r=1;
+				n[i][k] *= 2;
+				n_score += n[i][k];
+				for(int w=i-1;w>0;w--)
+				{
+					n[w][k]=n[w-1][k];
+				}
+				n[0][k]=0;
+			}
+		}
+	}
+
+	/*for(k=2;k>=0;--k)
 	{
 		for(k1=k;k1<=2;++k1)
 		{
@@ -567,7 +632,7 @@ bool CMy2048Dlg::move_down(int n[4][4],int &n_score)
 			}
 		}
 
-	}
+	}*/
 	return r;
 }
 bool CMy2048Dlg::move_left(int n[4][4],int &n_score)
@@ -577,34 +642,89 @@ bool CMy2048Dlg::move_left(int n[4][4],int &n_score)
 	bool r=0;
 	n_score = score;
 
-	for(k=1;k<4;++k)
-	{
-		for(k1=k;k1>=1;--k1)
-		{
-			for(i=0;i<4;++i)//行数
-			{
-				if(n[i][k1-1]==0)
-				{
-					if(n[i][k1]!=0)
-						r=1;
-					n[i][k1-1]=n[i][k1];
-					n[i][k1]=0;
-				}
-				else
-				{
-					if(n[i][k1]==n[i][k1-1])
-					{
-						r=1;
 
-						n[i][k1-1]*=2;
-						n[i][k1]=0;
-						n_score+=n[i][k1-1];
-					}
+	for(i=0;i<4;i++)
+	{
+		for(k=0;k<3;k++)
+		{
+			if(n[i][k]==0)//
+			{
+				int w;
+				for(w=k;w<3;w++)
+				{
+					n[i][w]=n[i][w+1];
+					if(n[i][w] != 0)
+						r=1;
 				}
+				n[i][3]=0;
+
+				for(w=k;w<4;w++)
+					if(n[i][w] != 0)
+						break;
+				if(w!=4)
+					k--;
+			}
+			else if(n[i][k+1] == 0)
+			{
+				int w;
+				for(w=k+1;w<3;w++)
+				{
+					n[i][w]=n[i][w+1];
+					if(n[i][w] != 0)
+						r=1;
+				}
+				n[i][3]=0;
+
+				for(w=k+1;w<4;w++)
+					if(n[i][w] != 0)
+						break;
+				if(w!=4)
+					k--;
+			}
+			else if(n[i][k]==n[i][k+1])
+			{
+				if(n[i][k] != 0)
+					r=1;
+				n[i][k] *= 2;
+				n_score += n[i][k];
+				for(int w=k+1;w<3;w++)
+				{
+					n[i][w]=n[i][w+1];
+				}
+				n[i][3]=0;
 			}
 		}
-
 	}
+
+
+	//for(k=1;k<4;++k)
+	//{
+	//	for(k1=k;k1>=1;--k1)
+	//	{
+	//		for(i=0;i<4;++i)//行数
+	//		{
+	//			if(n[i][k1-1]==0)
+	//			{
+	//				if(n[i][k1]!=0)
+	//					r=1;
+	//				n[i][k1-1]=n[i][k1];
+	//				n[i][k1]=0;
+	//			}
+	//			else
+	//			{
+	//				if(n[i][k1]==n[i][k1-1])
+	//				{
+	//					r=1;
+
+	//					n[i][k1-1]*=2;
+	//					n[i][k1]=0;
+	//					n_score+=n[i][k1-1];
+	//				}
+	//			}
+	//		}
+	//	}
+
+	//}
 	
 	return r;
 }
@@ -614,7 +734,60 @@ bool CMy2048Dlg::move_right(int n[4][4],int &n_score)
 	bool r=0;
 	n_score = score;
 
-	for(k=2;k>=0;--k)
+	for(i=0;i<4;i++)
+	{
+		for(k=3;k>0;k--)
+		{
+			if(n[i][k]==0)
+			{
+				int w;
+				for(w=k;w>0;w--)
+				{
+					n[i][w]=n[i][w-1];
+					if(n[i][w] != 0)
+						r=1;
+				}
+				n[i][0]=0;
+
+				for(w=k;w>0;w--)
+					if(n[i][w] != 0)
+						break;
+				if(w>0)
+					k++;
+			}
+			else if(n[i][k-1] == 0)
+			{
+				int w;
+				for(w=k-1;w>0;w--)
+				{
+					n[i][w]=n[i][w-1];
+					if(n[i][w] != 0)
+						r=1;
+				}
+				n[i][0]=0;
+
+				for(w=k-1;w>0;w--)
+					if(n[i][w] != 0)
+						break;
+				if(w>0)
+					k++;
+			}
+			else if(n[i][k]==n[i][k-1])
+			{
+				if(n[i][k] != 0)
+					r=1;
+				n[i][k] *= 2;
+				n_score += n[i][k];
+				for(int w=k-1;w>0;w--)
+				{
+					n[i][w]=n[i][w-1];
+				}
+				n[i][0]=0;
+			}
+		}
+	}
+
+	/*for(k=2;k>=0;--k)
 	{
 		for(k1=k;k1<=2;++k1)
 		{
@@ -641,38 +814,34 @@ bool CMy2048Dlg::move_right(int n[4][4],int &n_score)
 			}
 		}
 
-	}
+	}*/
 
 
 	return r;
 }
 
-
+//得到最适合的自动步骤
 double CMy2048Dlg::getCha(int n[4][4])
 {
 	double c=0;
 	int i,k,u;
 
 	for(i=0;i<4;i++)
-	{
-		for(k=0;k<2;k++)
+		for(k=0;k<3;k++)
 		{
-			int a1= n[i][k]-n[i][k+1];
-			int a2= n[i][k+1]-n[i][k+2];
-			if( a1*a2 <0 && n[i][k+1]!=0 )
-				c=c+ (abs(a1) +abs(a2))/32;
+			u=abs(n[i][k]-n[i][k+1]);
+			if(u==0)
+				c -= 3*n[i][k];
+			else c += u*1.5;
 		}
-	}
-	for(k=0;k<4;k++)
-	{
-		for(i=0;i<2;i++)
-		{
-			int a1= n[i][k]-n[i+1][k];
-			int a2= n[i+1][k]-n[i+2][k];
-			if( a1*a2 <0 && n[i+1][k]!=0 )
-				c=c+ (abs(a1) +abs(a2))/32;
-		}
-	}
+		for(k=0;k<4;k++)
+			for(i=0;i<3;i++)
+			{
+				u=abs(n[i][k]-n[i+1][k]);
+				if(u==0)
+					c -= 3*n[i][k];
+				else c += u*1.5;
+			}
 	for(i=0;i<4;i++)
 		for(k=0;k<4;k++)
 		{
