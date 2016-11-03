@@ -333,6 +333,9 @@ BOOL CMy2048Dlg::PreTranslateMessage(MSG* pMsg)
 		case VK_DOWN:
 			moveK(pMsg->wParam);
 			return 1;
+		case VK_ESCAPE:
+			Sleep(2000);
+			exit(1);
 		default:
 			return 1;
 		}
